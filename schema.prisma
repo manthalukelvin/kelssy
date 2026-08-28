@@ -1,0 +1,424 @@
+// Seshter 79 — Complete Database Schema
+// PostgreSQL + Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum Role {
+  USER
+  EDITOR
+  ANALYST
+  CONTENT_MANAGER
+  SUPER_ADMIN
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  ARCHIVED
+}
+
+enum PlaylistVisibility {
+  PRIVATE
+  PUBLIC
+  UNLISTED
+}
+
+// ==================== USERS & AUTH ====================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String?
+  image         String?
+  role          Role      @default(USER)
+  bio           String?
+  country       String?
+  isSuspended   Boolean   @default(false)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  playlists         Playlist[]
+  favorites         Favorite[]
+  listeningHistory  ListeningHistory[]
+  downloads         Download[]
+  plays             Play[]
+  notifications     Notification[]
+  comments          Comment[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==================== MUSIC CORE ====================
+
+model Artist {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  bio         String?  @db.Text
+  image       String?
+  country     String?
+  genres      String[] // quick tags
+  socialLinks Json?    // { instagram, twitter, youtube, website }
+  isVerified  Boolean  @default(false)
+  playCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  albums      Album[]
+  songs       Song[]   @relation("PrimaryArtist")
+  featuredOn  Song[]   @relation("FeaturedArtists")
+
+  @@index([name])
+  @@index([slug])
+  @@map("artists")
+}
+
+model Album {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  artistId    String
+  coverImage  String?
+  releaseDate DateTime?
+  genreId     String?
+  description String?       @db.Text
+  status      PublishStatus @default(DRAFT)
+  playCount   Int           @default(0)
+  likeCount   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  artist Artist  @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  genre  Genre?  @relation(fields: [genreId], references: [id])
+  songs  Song[]
+
+  @@index([title])
+  @@index([slug])
+  @@index([artistId])
+  @@index([status])
+  @@map("albums")
+}
+
+model Genre {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  image       String?
+  color       String?  // hex for UI
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  albums Album[]
+  songs  Song[]
+
+  @@index([slug])
+  @@map("genres")
+}
+
+model Song {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  artistId        String
+  albumId         String?
+  genreId         String?
+  coverImage      String?
+  audioUrl        String        // secure storage URL / path
+  downloadUrl     String?       // optional separate download file
+  duration        Int           // seconds
+  trackNumber     Int?
+  releaseDate     DateTime?
+  lyrics          String?       @db.Text
+  description     String?       @db.Text
+  producer        String?
+  composer        String?
+  language        String?
+  country         String?
+  tags            String[]
+  status          PublishStatus @default(DRAFT)
+  isFeatured      Boolean       @default(false)
+  isTrending      Boolean       @default(false)
+  allowDownload   Boolean       @default(false)
+  playCount       Int           @default(0)
+  downloadCount   Int           @default(0)
+  likeCount       Int           @default(0)
+  copyrightOwner  String?
+  licenseInfo     String?
+  contentSource   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  publishedAt     DateTime?
+
+  artist          Artist   @relation("PrimaryArtist", fields: [artistId], references: [id], onDelete: Cascade)
+  featuredArtists Artist[] @relation("FeaturedArtists")
+  album           Album?   @relation(fields: [albumId], references: [id])
+  genre           Genre?   @relation(fields: [genreId], references: [id])
+
+  playlistSongs   PlaylistSong[]
+  favorites       Favorite[]
+  listeningHistory ListeningHistory[]
+  downloads       Download[]
+  plays           Play[]
+
+  @@index([title])
+  @@index([slug])
+  @@index([artistId])
+  @@index([albumId])
+  @@index([genreId])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([isTrending])
+  @@index([playCount])
+  @@index([releaseDate])
+  @@map("songs")
+}
+
+// ==================== PLAYLISTS ====================
+
+model Playlist {
+  id          String             @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  coverImage  String?
+  visibility  PlaylistVisibility @default(PRIVATE)
+  isSystem    Boolean            @default(false) // Liked Songs, Recently Played, etc.
+  userId      String
+  playCount   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  songs PlaylistSong[]
+
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([visibility])
+  @@map("playlists")
+}
+
+model PlaylistSong {
+  id         String   @id @default(cuid())
+  playlistId String
+  songId     String
+  position   Int
+  addedAt    DateTime @default(now())
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song     Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, songId])
+  @@index([playlistId])
+  @@map("playlist_songs")
+}
+
+// ==================== USER ACTIVITY ====================
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  songId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, songId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+model ListeningHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  songId    String
+  playedAt  DateTime @default(now())
+  duration  Int?     // how many seconds listened
+  completed Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([userId, playedAt])
+  @@index([songId])
+  @@map("listening_history")
+}
+
+model Download {
+  id         String   @id @default(cuid())
+  userId     String?
+  songId     String
+  ipAddress  String?
+  userAgent  String?
+  downloadedAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  song Song  @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([songId])
+  @@index([userId])
+  @@map("downloads")
+}
+
+model Play {
+  id        String   @id @default(cuid())
+  userId    String?
+  songId    String
+  duration  Int?     // seconds played
+  completed Boolean  @default(false)
+  ipAddress String?
+  playedAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  song Song  @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@index([songId, playedAt])
+  @@index([userId])
+  @@map("plays")
+}
+
+// ==================== NEWS ====================
+
+model News {
+  id            String        @id @default(cuid())
+  title         String
+  slug          String        @unique
+  excerpt       String?
+  content       String        @db.Text
+  featuredImage String?
+  authorId      String?
+  category      String?
+  tags          String[]
+  status        PublishStatus @default(DRAFT)
+  seoTitle      String?
+  seoDescription String?
+  viewCount     Int           @default(0)
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  comments Comment[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("news")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  userId    String
+  newsId    String?
+  // future: songId, albumId etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  news News? @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@index([newsId])
+  @@map("comments")
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // "new_music", "announcement", etc.
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ==================== PLATFORM SETTINGS ====================
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  action    String
+  entity    String?
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
