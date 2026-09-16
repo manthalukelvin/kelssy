@@ -2,13 +2,16 @@ package com.my24hours.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.my24hours.app.data.repository.TaskInput
 import com.my24hours.app.data.repository.TaskRepository
+import com.my24hours.app.domain.model.Priority
 import com.my24hours.app.domain.model.Task
+import com.my24hours.app.domain.model.TaskCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -35,32 +38,15 @@ class TasksViewModel @Inject constructor(
         selectedDate.value = date
     }
 
-    fun addTask(
-        title: String,
-        startHour: Int = 9,
-        startMinute: Int = 0,
-        durationMinutes: Int = 60,
-        recurring: Boolean = false,
-        recurrenceRule: String? = null
-    ) {
-        viewModelScope.launch {
-            repo.addTask(
-                title = title,
-                date = selectedDate.value,
-                startHour = startHour,
-                startMinute = startMinute,
-                durationMinutes = durationMinutes,
-                recurring = recurring,
-                recurrenceRule = recurrenceRule
-            )
-        }
+    fun addTask(input: TaskInput) {
+        viewModelScope.launch { repo.addTask(input) }
     }
 
-    fun toggle(id: String) {
-        viewModelScope.launch { repo.toggleComplete(id) }
+    fun toggle(task: Task) {
+        viewModelScope.launch { repo.toggleComplete(task) }
     }
 
-    fun delete(id: String) {
-        viewModelScope.launch { repo.delete(id) }
+    fun delete(task: Task) {
+        viewModelScope.launch { repo.delete(task) }
     }
 }

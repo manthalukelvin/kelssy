@@ -14,7 +14,7 @@ class My24HoursApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        NotificationHelper.createChannel(this)
+        NotificationHelper.createChannels(this)
     }
 
     override val workManagerConfiguration: Configuration

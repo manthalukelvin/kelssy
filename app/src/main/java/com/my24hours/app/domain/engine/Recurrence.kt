@@ -108,12 +108,17 @@ private fun materializeInstance(template: Task, date: LocalDate): Task {
 /** Tasks that should appear on a given calendar day (one-offs + expanded series). */
 fun tasksForDate(allTasks: List<Task>, date: LocalDate): List<Task> {
     val templates = allTasks.filter { it.recurring && !it.recurrenceRule.isNullOrBlank() }
-    val nonRecurring = allTasks.filter { !it.recurring && it.date == date }
+    val nonRecurring = allTasks.filter {
+        !it.recurring && it.date == date && !it.notes.contains("[cancelled]")
+    }
     val overrides = allTasks.filter { !it.recurring && (it.seriesId != null || it.id.contains("_")) }
 
     val expanded = templates.flatMap { expandRecurring(it, date, date, overrides) }
+        .filter { !it.notes.contains("[cancelled]") }
 
     val byId = LinkedHashMap<String, Task>()
     (nonRecurring + expanded).forEach { byId[it.id] = it }
+    // If override is cancelled, remove it
+    byId.entries.removeAll { it.value.notes.contains("[cancelled]") }
     return byId.values.sortedBy { it.scheduledStart?.toInstant()?.toEpochMilli() ?: Long.MAX_VALUE }
 }

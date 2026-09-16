@@ -103,7 +103,7 @@ fun HomeScreen(
                             Modifier.fillMaxWidth().padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Checkbox(checked = task.completed, onCheckedChange = { vm.toggle(task.id) })
+                            Checkbox(checked = task.completed, onCheckedChange = { vm.toggle(task) })
                             Column(Modifier.weight(1f)) {
                                 Text(task.title, fontWeight = FontWeight.Medium)
                                 val time = task.scheduledStart?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm"))
