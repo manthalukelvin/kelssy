@@ -3,25 +3,20 @@ package com.my24hours.app.ui.screens.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.my24hours.app.BuildConfig
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Scaffold(topBar = { TopAppBar(title = { Text("Settings") }) }) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Server", style = MaterialTheme.typography.titleMedium)
+            Text(BuildConfig.API_BASE_URL, style = MaterialTheme.typography.bodyMedium)
             Text(
-                "SettingsScreen",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "Screen ready – wire to repository next",
-                style = MaterialTheme.typography.bodyMedium,
+                "Tasks and habits are saved on this phone immediately. When the server is live they also sync in the background. If the server is down, the app still works offline.",
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

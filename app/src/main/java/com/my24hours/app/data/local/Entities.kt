@@ -125,3 +125,65 @@ fun Task.toEntity(): TaskEntity = TaskEntity(
     remoteId = remoteId,
     needsSync = needsSync
 )
+
+fun HabitEntity.toDomain(): com.my24hours.app.domain.model.Habit =
+    com.my24hours.app.domain.model.Habit(
+        id = id,
+        name = name,
+        description = description,
+        icon = icon,
+        targetPerWeek = targetPerWeek,
+        createdAt = java.time.OffsetDateTime.parse(createdAt),
+        archived = archived,
+        remoteId = remoteId,
+        needsSync = needsSync
+    )
+
+fun com.my24hours.app.domain.model.Habit.toEntity(): HabitEntity = HabitEntity(
+    id = id,
+    name = name,
+    description = description,
+    icon = icon,
+    targetPerWeek = targetPerWeek,
+    createdAt = createdAt.toString(),
+    archived = archived,
+    remoteId = remoteId,
+    needsSync = needsSync
+)
+
+fun HabitCompletionEntity.toDomain(): com.my24hours.app.domain.model.HabitCompletion =
+    com.my24hours.app.domain.model.HabitCompletion(
+        id = id,
+        habitId = habitId,
+        date = java.time.LocalDate.parse(date),
+        completedAt = java.time.OffsetDateTime.parse(completedAt)
+    )
+
+fun FocusSessionEntity.toDomain(): com.my24hours.app.domain.model.FocusSession =
+    com.my24hours.app.domain.model.FocusSession(
+        id = id,
+        taskId = taskId,
+        taskTitle = taskTitle,
+        startedAt = java.time.OffsetDateTime.parse(startedAt),
+        endedAt = endedAt?.let { java.time.OffsetDateTime.parse(it) },
+        plannedMinutes = plannedMinutes,
+        durationMinutes = durationMinutes,
+        pauseCount = pauseCount,
+        pausedDurationMinutes = pausedDurationMinutes,
+        completed = completed,
+        interruptions = interruptions
+    )
+
+fun com.my24hours.app.domain.model.FocusSession.toEntity(): FocusSessionEntity = FocusSessionEntity(
+    id = id,
+    taskId = taskId,
+    taskTitle = taskTitle,
+    startedAt = startedAt.toString(),
+    endedAt = endedAt?.toString(),
+    plannedMinutes = plannedMinutes,
+    durationMinutes = durationMinutes,
+    pauseCount = pauseCount,
+    pausedDurationMinutes = pausedDurationMinutes,
+    completed = completed,
+    interruptions = interruptions
+)

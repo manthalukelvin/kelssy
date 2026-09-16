@@ -30,7 +30,7 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector,
 }
 
 val bottomScreens = listOf(
-    Screen.Home, Screen.Planner, Screen.Tasks, Screen.Focus, Screen.Habits
+    Screen.Home, Screen.Planner, Screen.Tasks, Screen.Focus, Screen.Assistant
 )
 
 @Composable

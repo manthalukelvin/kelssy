@@ -25,6 +25,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE needsSync = 1")
     suspend fun getPendingSync(): List<TaskEntity>
+
+    @Query("SELECT * FROM tasks")
+    suspend fun getAll(): List<TaskEntity>
 }
 
 @Dao
