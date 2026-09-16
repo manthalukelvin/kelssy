@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.my24hours.app.data.remote.ApiService
 import com.my24hours.app.data.remote.ChatRequest
 import com.my24hours.app.data.remote.PlanRequest
+import com.my24hours.app.data.repository.TaskInput
 import com.my24hours.app.data.repository.TaskRepository
 import com.my24hours.app.data.repository.toDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,11 +75,13 @@ class AssistantViewModel @Inject constructor(
                     val h = start.substringBefore(":").toIntOrNull() ?: 9
                     val m = start.substringAfter(":").toIntOrNull() ?: 0
                     repo.addTask(
-                        title = dto.title,
-                        date = date,
-                        startHour = h,
-                        startMinute = m,
-                        durationMinutes = dto.estimatedDurationMinutes
+                        TaskInput(
+                            title = dto.title,
+                            date = date,
+                            startHour = h,
+                            startMinute = m,
+                            durationMinutes = dto.estimatedDurationMinutes
+                        )
                     )
                 }
                 _messages.value = _messages.value + ChatLine(

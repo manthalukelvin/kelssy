@@ -122,3 +122,12 @@ fun tasksForDate(allTasks: List<Task>, date: LocalDate): List<Task> {
     byId.entries.removeAll { it.value.notes.contains("[cancelled]") }
     return byId.values.sortedBy { it.scheduledStart?.toInstant()?.toEpochMilli() ?: Long.MAX_VALUE }
 }
+
+fun isRecurringTemplate(task: Task): Boolean =
+    task.recurring && !task.recurrenceRule.isNullOrBlank()
+
+fun isRecurringInstance(task: Task): Boolean {
+    if (task.seriesId != null) return true
+    // Instance ids look like: task_<uuid>_2026-09-17
+    return Regex(".+_\\d{4}-\\d{2}-\\d{2}$").matches(task.id)
+}
