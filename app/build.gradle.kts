@@ -19,7 +19,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"https://my24hrs.onrender.com/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://my24hrs.onrender.com/api\"")
     }
 
     buildTypes {
