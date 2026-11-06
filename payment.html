@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MyJournal+ — Premium Payment</title>
+  <meta name="description" content="Choose a MyJournal+ Premium plan and pay securely with PayChangu or PayPal/card. Contact support@myjournalplus.com or WhatsApp +265 89 614 4664 for assistance or alternative payment options.">
+  <meta name="theme-color" content="#7b6cff">
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --premium-purple: #7b6cff;
+      --premium-purple-dark: #5b50e6;
+      --premium-cyan: #4dd3ff;
+      --success: #3ddc97;
+      --page-bg: radial-gradient(circle at 20% 10%, rgba(123,108,255,.15), transparent 35%),
+                 radial-gradient(circle at 85% 80%, rgba(77,211,255,.10), transparent 35%),
+                 linear-gradient(180deg, #050b1b 0%, #071329 55%, #040a18 100%);
+      --text-main: #f5f7ff;
+      --text-muted: rgba(230, 238, 255, .72);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main); background: var(--page-bg);
+    }
+    a { -webkit-tap-highlight-color: transparent; }
+    .premium-header {
+      position: sticky; top: 0; z-index: 100; width: 100%; padding: 13px 20px;
+      background: rgba(4, 10, 24, .72); border-bottom: 1px solid rgba(255,255,255,.07);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    }
+    .header-inner {
+      width: min(900px, 100%); margin: 0 auto; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: white; }
+    .brand img { width: 39px; height: 39px; border-radius: 11px; object-fit: cover; box-shadow: 0 8px 25px rgba(123,108,255,.25); }
+    .brand-text strong { display: block; font-size: 15px; }
+    .brand-text span { display: block; margin-top: 2px; color: var(--text-muted); font-size: 11px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px;
+      border-radius: 11px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.035); transition: .2s ease;
+    }
+    .back-btn:hover { color: white; background: rgba(255,255,255,.08); transform: translateY(-1px); }
+    .confirm-page { width: min(900px, calc(100% - 30px)); margin: 0 auto; padding: 40px 0 35px; }
+    .premium-hero { text-align: center; max-width: 700px; margin: 0 auto 28px; animation: fadeUp .7s ease; }
+    .premium-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+      background: linear-gradient(135deg, rgba(123,108,255,.18), rgba(77,211,255,.10));
+      border: 1px solid rgba(123,108,255,.28); color: #c4beff; font-size: 12px; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .premium-hero h1 {
+      margin: 18px 0 12px; font-size: clamp(2rem, 5.5vw, 3.4rem); line-height: 1.05; letter-spacing: -1.5px;
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, var(--premium-purple), var(--premium-cyan));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .premium-hero p { max-width: 560px; margin: 0 auto; color: var(--text-muted); line-height: 1.7; font-size: 15px; }
+    .confirm-card {
+      padding: 24px; border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+      border: 1px solid rgba(255,255,255,.09); box-shadow: 0 35px 100px rgba(0,0,0,.38);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); animation: fadeUp .8s ease;
+    }
+    .section-label {
+      color: var(--text-muted); font-size: 12px; font-weight: 700; letter-spacing: .4px;
+      text-transform: uppercase; margin-bottom: 12px; text-align: center;
+    }
+    .plans {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px;
+    }
+    .plan-btn {
+      padding: 16px 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22); color: #fff; cursor: pointer; text-align: center;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .plan-btn:hover { transform: translateY(-2px); border-color: rgba(123,108,255,.4); }
+    .plan-btn.selected {
+      border: 2px solid #4dd3ff;
+      background: linear-gradient(135deg, rgba(123,108,255,.28), rgba(77,211,255,.12));
+    }
+    .plan-btn .plan-name { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+    .plan-btn .plan-price { font-size: 22px; font-weight: 900; }
+    .plan-btn .plan-note { font-size: 11px; opacity: .6; margin-top: 2px; }
+    .plan-btn .plan-badge {
+      display: inline-flex;
+      margin-bottom: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+      background: rgba(77,211,255,.14);
+      border: 1px solid rgba(77,211,255,.45);
+      color: #9cecff;
+      padding: 3px 7px;
+      border-radius: 999px;
+    }
+    .features {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+      list-style: none; padding: 0; margin: 0 0 22px;
+    }
+    .feature {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
+      color: var(--text-muted); font-size: 12px;
+    }
+    .paychangu-box {
+      padding: 18px; border-radius: 16px; border: 1px solid rgba(123,108,255,.25);
+      background: rgba(123,108,255,.08); margin-bottom: 16px;
+    }
+    .paychangu-box h3 { margin: 0 0 6px; font-size: 16px; }
+    .paychangu-box p { margin: 0 0 14px; color: var(--text-muted); font-size: 12px; line-height: 1.55; }
+    .pay-btn {
+      width: 100%; min-height: 52px; border: none; border-radius: 13px; cursor: pointer;
+      font-size: 14px; font-weight: 800; color: #041025;
+      background: linear-gradient(90deg, var(--premium-purple), var(--premium-cyan));
+      box-shadow: 0 12px 35px rgba(123,108,255,.22); display: flex; align-items: center;
+      justify-content: center; gap: 10px; transition: transform .2s, box-shadow .2s;
+    }
+    .pay-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 18px 45px rgba(123,108,255,.3); }
+    .pay-btn:disabled { opacity: .55; cursor: not-allowed; }
+    .status-msg {
+      margin-top: 14px; padding: 12px; border-radius: 12px; font-size: 12px; line-height: 1.5;
+      display: none; text-align: center;
+    }
+    .status-msg.error { display: block; background: rgba(255,80,80,.1); border: 1px solid rgba(255,80,80,.25); color: #ff9b9b; }
+    .status-msg.success { display: block; background: rgba(61,220,151,.08); border: 1px solid rgba(61,220,151,.2); color: var(--success); }
+    .status-msg.info { display: block; background: rgba(123,108,255,.1); border: 1px solid rgba(123,108,255,.2); color: #c4beff; }
+    .security-note {
+      margin-top: 16px; padding: 12px; border-radius: 12px;
+      background: rgba(61,220,151,.045); border: 1px solid rgba(61,220,151,.1);
+      color: var(--text-muted); font-size: 11px; line-height: 1.55; text-align: center;
+    }
+    .help {
+      margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.07);
+      color: var(--text-muted); font-size: 11px; line-height: 1.7; text-align: center;
+    }
+    .help a { color: var(--premium-cyan); text-decoration: none; }
+    .premium-footer {
+      width: min(900px, calc(100% - 30px)); margin: 0 auto; padding: 24px 0 32px;
+      text-align: center; color: rgba(230,238,255,.5); font-size: 11px;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .plans { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      .confirm-page { width: calc(100% - 18px); padding-top: 28px; }
+      .confirm-card { padding: 16px; border-radius: 20px; }
+      .brand-text span { display: none; }
+    }
+  </style>
+
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://myjournalplus.com/payment">
+</head>
+<body>
+  <header class="premium-header">
+    <div class="header-inner">
+      <a href="home.html" class="brand">
+        <img src="logo.png" alt="MyJournal+ logo" onerror="this.style.display='none'">
+        <div class="brand-text">
+          <strong>MyJournal+</strong>
+          <span>Reflect · Track · Grow</span>
+        </div>
+      </a>
+      <a href="home" class="back-btn">← Back to app</a>
+    </div>
+  </header>
+
+  <main class="confirm-page">
+    <section class="premium-hero">
+      <span class="premium-badge">✦ MyJournal+ Premium</span>
+      <h1>Premium <span class="gradient-text">Payment</span></h1>
+      <p>Choose your plan and pay securely with PayChangu or PayPal. Your account is upgraded after successful verification.</p>
+    </section>
+
+    <div class="confirm-card">
+      <div class="section-label">1. Choose your plan</div>
+      <div class="plans">
+        <button type="button" class="plan-btn" data-plan="monthly">
+          <div class="plan-name" id="plan-monthly-name">Monthly</div>
+          <div class="plan-price" id="plan-monthly-price">$2.49/month</div>
+          <div class="plan-note" id="plan-monthly-note">Billed monthly</div>
+        </button>
+        <button type="button" class="plan-btn selected recommended" data-plan="yearly">
+          <div class="plan-badge">Most Popular</div>
+          <div class="plan-name" id="plan-yearly-name">Annual</div>
+          <div class="plan-price" id="plan-yearly-price">$20/year</div>
+          <div class="plan-note" id="plan-yearly-note">Best value for regular journaling</div>
+        </button>
+        <button type="button" class="plan-btn" data-plan="lifetime">
+          <div class="plan-name" id="plan-lifetime-name">Lifetime</div>
+          <div class="plan-price" id="plan-lifetime-price">$49.99 one-time</div>
+          <div class="plan-note" id="plan-lifetime-note">Single payment, lifetime access</div>
+        </button>
+      </div>
+      <input type="hidden" id="selected-plan" value="yearly">
+
+      <div class="section-label">What you get</div>
+      <ul class="features">
+        <li class="feature"><span>✍️</span> Advanced journal formatting</li>
+        <li class="feature"><span>🎨</span> Premium themes</li>
+        <li class="feature"><span>🤖</span> AI-powered Insights</li>
+        <li class="feature"><span>📊</span> Mood analytics</li>
+        <li class="feature"><span>📄</span> PDF &amp; Excel exports</li>
+        <li class="feature"><span>🔐</span> PIN protection</li>
+        <li class="feature"><span>☁️</span> Multi-device sync</li>
+        <li class="feature"><span>♾️</span> Premium access</li>
+      </ul>
+
+      <div class="section-label">2. Pay with PayChangu</div>
+      <div class="paychangu-box">
+        <h3>PayChangu — Malawi</h3>
+        <p>Airtel Money · TNM Mpamba · Bank transfer · Cards. One secure checkout. After payment you are redirected back and Premium is activated automatically.</p>
+        <button type="button" id="pay-btn" class="pay-btn" onclick="startPayChanguPayment()">
+          <span>💳</span>
+          <span id="pay-btn-label">Pay with PayChangu</span>
+        </button>
+      </div>
+
+      <div class="section-label">3. Pay with PayPal or Card</div>
+      <div class="paychangu-box" style="border-color:rgba(77,211,255,.25);background:rgba(77,211,255,.06);">
+        <h3>PayPal · Debit/Credit Card</h3>
+        <p>Prefer PayPal or an international card? Secure checkout powered by PayPal.</p>
+        <button type="button" id="paypal-pay-btn" class="pay-btn" onclick="startPayPalPayment()">
+          <span>💳</span>
+          <span id="paypal-btn-label">Pay with PayPal / Card</span>
+        </button>
+      </div>
+
+      <div id="status-msg" class="status-msg"></div>
+
+      <div class="security-note">
+        <strong style="color:var(--success)">🔐 Secure</strong><br>
+        Payments are processed by PayChangu or PayPal. MyJournal+ never sees your mobile money PIN or card details.
+      </div>
+
+      <div class="help">
+        Need help? Email
+        <a href="mailto:support@myjournalplus.com">support@myjournalplus.com</a>
+        or WhatsApp
+        <a href="https://wa.me/265896144664" target="_blank" rel="noopener">+265 89 614 4664</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="premium-footer">
+    © 2026 Celma Tech Foundation · MyJournal+
+  </footer>
+
+  <!-- Firebase Auth (required so the server can identify the user) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script>
+  // ============================================================
+  // PASTE THE SAME FIREBASE CONFIG as in login.html
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtzbIZvFLQM65QhOwph0PFpO9vOYcYUdE",
+    authDomain: "myjournal-plus.firebaseapp.com",
+    databaseURL: "https://myjournal-plus-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "myjournal-plus",
+    storageBucket: "myjournal-plus.firebasestorage.app",
+    messagingSenderId: "288260274583",
+    appId: "1:288260274583:web:9c40aafed9ab9fa30e6cd2",
+    measurementId: "G-MXJ84MJGTR"
+  };
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  </script>
+ 
+
+  <script src="js/subscription-config.js"></script>
+  <script>
+(function () {
+  // ========== CONFIG ==========
+  // Your payment API host (no trailing slash)
+  // This is the Vercel project that hosts both PayChangu + PayPal endpoints
+  const API_BASE = 'https://myjournalpluspaychangu.vercel.app';
+  const LOGIN_PAGE = 'login';
+
+  const SUBSCRIPTION = window.MJ_SUBSCRIPTION_CONFIG || { plans: [] };
+
+  function applyPricingConfig() {
+    const planMap = {};
+    (SUBSCRIPTION.plans || []).forEach(plan => { planMap[plan.id] = plan; });
+    const monthly = planMap.monthly;
+    const yearly = planMap.yearly;
+    const lifetime = planMap.lifetime;
+
+    if (monthly) {
+      const monthlyName = document.getElementById('plan-monthly-name');
+      const monthlyPrice = document.getElementById('plan-monthly-price');
+      const monthlyNote = document.getElementById('plan-monthly-note');
+      if (monthlyName) monthlyName.textContent = monthly.shortLabel || monthly.label;
+      if (monthlyPrice) monthlyPrice.textContent = monthly.priceDisplay;
+      if (monthlyNote) monthlyNote.textContent = monthly.note || '';
+    }
+    if (yearly) {
+      const yearlyName = document.getElementById('plan-yearly-name');
+      const yearlyPrice = document.getElementById('plan-yearly-price');
+      const yearlyNote = document.getElementById('plan-yearly-note');
+      if (yearlyName) yearlyName.textContent = yearly.shortLabel || yearly.label;
+      if (yearlyPrice) yearlyPrice.textContent = yearly.priceDisplay;
+      if (yearlyNote) yearlyNote.textContent = yearly.note || '';
+    }
+    if (lifetime) {
+      const lifetimeName = document.getElementById('plan-lifetime-name');
+      const lifetimePrice = document.getElementById('plan-lifetime-price');
+      const lifetimeNote = document.getElementById('plan-lifetime-note');
+      if (lifetimeName) lifetimeName.textContent = lifetime.shortLabel || lifetime.label;
+      if (lifetimePrice) lifetimePrice.textContent = lifetime.priceDisplay;
+      if (lifetimeNote) lifetimeNote.textContent = lifetime.note || '';
+    }
+  }
+
+  applyPricingConfig();
+
+  // ========== Plan selection ==========
+  document.querySelectorAll('.plan-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.plan-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('selected-plan').value = btn.getAttribute('data-plan');
+    });
+  });
+
+  function selectedPlan() {
+    return document.getElementById('selected-plan').value || 'lifetime';
+  }
+
+  function showStatus(type, text) {
+    const el = document.getElementById('status-msg');
+    el.className = 'status-msg ' + type;
+    el.textContent = text;
+  }
+
+  function setLoading(loading, provider) {
+    if (provider === 'paypal') {
+      const btn = document.getElementById('paypal-pay-btn');
+      const label = document.getElementById('paypal-btn-label');
+      if (btn) btn.disabled = loading;
+      if (label) label.textContent = loading ? 'Redirecting to PayPal…' : 'Pay with PayPal / Card';
+    } else {
+      const btn = document.getElementById('pay-btn');
+      const label = document.getElementById('pay-btn-label');
+      if (btn) btn.disabled = loading;
+      if (label) label.textContent = loading ? 'Redirecting to PayChangu…' : 'Pay with PayChangu';
+    }
+  }
+
+  async function waitForFirebaseAuth(timeoutMs = 12000) {
+    const started = Date.now();
+    while ((!window.firebase || !firebase.auth) && Date.now() - started < timeoutMs) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    if (!window.firebase || !firebase.auth) return null;
+    return firebase.auth();
+  }
+
+  async function getIdToken() {
+    const auth = await waitForFirebaseAuth();
+    if (!auth) return null;
+    const user = auth.currentUser;
+    if (user) return user.getIdToken(true);
+    return new Promise(resolve => {
+      let done = false;
+      const unsub = auth.onAuthStateChanged(async u => {
+        if (done) return;
+        done = true;
+        unsub();
+        try { resolve(u ? await u.getIdToken(true) : null); }
+        catch (_) { resolve(null); }
+      });
+      setTimeout(() => {
+        if (!done) { done = true; try { unsub(); } catch (_) {} resolve(null); }
+      }, 10000);
+    });
+  }
+
+  // ========== Start PayChangu ==========
+  window.startPayChanguPayment = async function () {
+    const plan = selectedPlan();
+    setLoading(true, 'paychangu');
+    showStatus('info', 'Checking your account…');
+
+    const token = await getIdToken();
+    if (!token) {
+      setLoading(false, 'paychangu');
+      showStatus('error', 'Please sign in first to upgrade.');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      return;
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/payments/create-paychangu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ plan })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.checkoutUrl || !data.txRef) {
+        console.error('Create payment error:', data);
+        setLoading(false, 'paychangu');
+        showStatus('error', data.error || 'Could not start payment. Please try again.');
+        return;
+      }
+
+      sessionStorage.setItem('mj_pending_tx', data.txRef);
+      sessionStorage.setItem('mj_pending_plan', plan);
+      window.location.assign(data.checkoutUrl);
+    } catch (e) {
+      console.error(e);
+      setLoading(false, 'paychangu');
+      showStatus('error', 'Network error. Please check your connection and try again.');
+    }
+  };
+
+  // ========== Start PayPal ==========
+  window.startPayPalPayment = async function () {
+    const plan = selectedPlan();
+    setLoading(true, 'paypal');
+    showStatus('info', 'Checking your account…');
+
+    const token = await getIdToken();
+    if (!token) {
+      setLoading(false, 'paypal');
+      showStatus('error', 'Please sign in first to upgrade.');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      return;
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/payments/create-paypal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ plan })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.checkoutUrl || !data.orderId) {
+        console.error('Create PayPal error:', data);
+        setLoading(false, 'paypal');
+        showStatus('error', data.error || 'Could not start PayPal payment. Please try again.');
+        return;
+      }
+
+      // Store for verification on return
+      sessionStorage.setItem('mj_pending_paypal_order', data.orderId);
+      sessionStorage.setItem('mj_pending_plan', plan);
+
+      window.location.assign(data.checkoutUrl);
+    } catch (e) {
+      console.error(e);
+      setLoading(false, 'paypal');
+      showStatus('error', 'Network error. Please check your connection and try again.');
+    }
+  };
+
+  // ========== Handle return from payment providers ==========
+  async function verifyOnReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const provider = (params.get('provider') || '').toLowerCase();
+    const status = (params.get('status') || '').toLowerCase();
+
+    // ---------- PayPal return ----------
+    if (provider === 'paypal') {
+      const orderId = params.get('token') || sessionStorage.getItem('mj_pending_paypal_order');
+      if (!orderId) return;
+
+      if (status === 'cancelled' || status === 'canceled') {
+        showStatus('error', 'PayPal payment was cancelled. You can try again.');
+        sessionStorage.removeItem('mj_pending_paypal_order');
+        return;
+      }
+
+      showStatus('info', 'Verifying your PayPal payment…');
+      setLoading(true, 'paypal');
+
+      const token = await getIdToken();
+      if (!token) {
+        setLoading(false, 'paypal');
+        showStatus('error', 'Please sign in with the same account you used before paying.');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + '/api/payments/verify-paypal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ orderId })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data.success) {
+          sessionStorage.removeItem('mj_pending_paypal_order');
+          sessionStorage.removeItem('mj_pending_plan');
+          showStatus('success', 'Premium activated! Redirecting…');
+          setTimeout(() => { window.location.replace('home.html'); }, 1800);
+          return;
+        }
+
+        setLoading(false, 'paypal');
+        showStatus('info', data.message || data.error || 'Payment received. Premium will activate shortly. If it does not, contact support with order: ' + orderId);
+      } catch (e) {
+        console.error(e);
+        setLoading(false, 'paypal');
+        showStatus('error', 'Could not verify PayPal payment yet. Contact support with order: ' + orderId);
+      }
+      return;
+    }
+
+    // ---------- PayChangu return (original logic) ----------
+    const tx = params.get('tx_ref') || params.get('tx') || sessionStorage.getItem('mj_pending_tx');
+    if (!tx) return;
+
+    if (status && !['success', 'successful', 'completed', 'paid'].includes(status)) {
+      showStatus('error', 'Payment was cancelled or failed. You can try again.');
+      sessionStorage.removeItem('mj_pending_tx');
+      return;
+    }
+
+    showStatus('info', 'Verifying your payment…');
+    setLoading(true, 'paychangu');
+
+    const token = await getIdToken();
+    if (!token) {
+      setLoading(false, 'paychangu');
+      showStatus('error', 'Please sign in with the same account you used before paying.');
+      return;
+    }
+
+    try {
+      const res = await fetch(API_BASE + '/api/payments/verify-paychangu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ txRef: tx })
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        sessionStorage.removeItem('mj_pending_tx');
+        sessionStorage.removeItem('mj_pending_plan');
+        showStatus('success', 'Premium activated! Redirecting…');
+        setTimeout(() => { window.location.replace('home.html'); }, 1800);
+        return;
+      }
+
+      console.log('Verify response:', data);
+      setLoading(false, 'paychangu');
+      showStatus('info', data.message || 'Payment received. Premium will activate shortly. If it does not, contact support with your reference: ' + tx);
+    } catch (e) {
+      console.error(e);
+      setLoading(false, 'paychangu');
+      showStatus('error', 'Could not verify yet. Keep this page open or contact support with reference: ' + tx);
+    }
+  }
+
+  window.addEventListener('load', async () => {
+    const auth = await waitForFirebaseAuth(15000);
+    if (!auth) {
+      showStatus('error', 'Firebase failed to load. Check your firebaseConfig on this page.');
+      return;
+    }
+
+    // Require sign-in before paying (unless returning from a payment provider)
+    const params = new URLSearchParams(window.location.search);
+    const returning = !!(
+      params.get('provider') === 'paypal' ||
+      params.get('tx_ref') ||
+      params.get('tx') ||
+      sessionStorage.getItem('mj_pending_tx') ||
+      sessionStorage.getItem('mj_pending_paypal_order')
+    );
+
+    await new Promise(resolve => {
+      let done = false;
+      const unsub = auth.onAuthStateChanged(user => {
+        if (done) return;
+        done = true;
+        try { unsub(); } catch (_) {}
+        if (!user && !returning) {
+          showStatus('info', 'Please sign in to upgrade. Redirecting to login…');
+          setTimeout(() => { window.location.href = LOGIN_PAGE; }, 1200);
+        } else if (user) {
+          showStatus('success', 'Signed in as ' + (user.email || 'user') + '. Choose a plan and pay.');
+        }
+        resolve();
+      });
+      setTimeout(() => {
+        if (!done) { done = true; try { unsub(); } catch (_) {} resolve(); }
+      }, 8000);
+    });
+
+    if (returning) {
+      await verifyOnReturn();
+    }
+  });
+})();
+  </script>
+</body>
+</html>

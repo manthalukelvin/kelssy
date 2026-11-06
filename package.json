@@ -1,0 +1,9 @@
+{
+  "name": "myjournal-paypal-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PayPal + Firebase secured payment endpoints for MyJournal+",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
