@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d17">
+  <meta name="description" content="Celma AI Agent — Advanced personal brand automation & growth command centre">
+  <title>Celma AI Agent</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <!-- Login gate -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-lockup large">
+        <span class="brand-mark">C<span>+</span></span>
+        <div>
+          <strong>Celma AI Agent</strong>
+          <small>PERSONAL BRAND COMMAND CENTRE</small>
+        </div>
+      </div>
+      <p class="login-desc">Enter the password set in your <code>.env</code> file to continue.</p>
+      <form id="loginForm">
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="Your strong password">
+        </label>
+        <button type="submit" class="btn primary full" id="loginBtn">Unlock dashboard</button>
+      </form>
+      <p id="loginError" class="error-text hidden"></p>
+      <p class="login-hint">Tip: set <code>APP_PASSWORD</code> (or a bcrypt hash) in <code>.env</code>.</p>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="appShell" class="app-shell hidden">
+    <aside class="sidebar">
+      <a class="brand-lockup" href="#studio">
+        <span class="brand-mark">C<span>+</span></span>
+        <span><strong>Celma AI</strong><small>AGENT v2</small></span>
+      </a>
+
+      <div class="workspace-label">COMMAND</div>
+      <nav class="nav" aria-label="Main">
+        <button class="nav-item active" data-view="studio"><span>✦</span> Content studio</button>
+        <button class="nav-item" data-view="queue"><span>◎</span> Approval queue <b id="queueCount">0</b></button>
+        <button class="nav-item" data-view="library"><span>▤</span> Library <b id="libraryCount">0</b></button>
+        <button class="nav-item" data-view="agent"><span>◈</span> Agent brain</button>
+        <button class="nav-item" data-view="growth"><span>↗</span> Growth & insights</button>
+        <button class="nav-item" data-view="learn"><span>◎</span> Learn from others</button>
+        <button class="nav-item" data-view="activity"><span>≡</span> Activity log</button>
+        <button class="nav-item" data-view="connections"><span>⇄</span> Connections</button>
+        <button class="nav-item" data-view="diagnose"><span>⚙</span> Diagnostics</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill" id="geminiStatus">Gemini · checking…</div>
+        <button class="btn ghost small" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- STUDIO -->
+      <section class="view active" id="view-studio">
+        <header class="view-header">
+          <div>
+            <h1>Content studio</h1>
+            <p>Generate posts, scripts and image prompts with your agent instructions.</p>
+          </div>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Generate</div>
+            <div class="form-grid">
+              <label class="field">
+                <span>Platform</span>
+                <select id="genPlatform">
+                  <option>TikTok</option>
+                  <option>YouTube</option>
+                  <option>Facebook</option>
+                  <option>Instagram</option>
+                  <option>X</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Content type</span>
+                <select id="genType">
+                  <option value="post">Post / caption</option>
+                  <option value="reel-script">Reel / short script</option>
+                  <option value="video-script">Long video script</option>
+                  <option value="image-prompt">Image prompt</option>
+                  <option value="carousel">Carousel ideas</option>
+                  <option value="thread">Thread</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Objective</span>
+                <select id="genObjective">
+                  <option>Engagement</option>
+                  <option>Awareness</option>
+                  <option>Authority</option>
+                  <option>Website visits</option>
+                  <option>Sign-ups</option>
+                  <option>Community</option>
+                  <option>Education</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Tone</span>
+                <input id="genTone" placeholder="authentic, clear, valuable" value="authentic, clear, valuable">
+              </label>
+              <label class="field full">
+                <span>Topic / brief</span>
+                <textarea id="genTopic" rows="3" placeholder="What should this content be about?"></textarea>
+              </label>
+              <label class="field full">
+                <span>Audience (optional)</span>
+                <input id="genAudience" placeholder="e.g. ambitious students, early-stage founders…">
+              </label>
+            </div>
+            <button class="btn primary" id="generateBtn"><span>✦</span> Generate with agent</button>
+          </div>
+
+          <div class="card result-card">
+            <div class="card-title row">
+              <span id="resultTitle">Ready</span>
+              <span class="badge" id="resultBadge">—</span>
+            </div>
+            <textarea id="resultContent" class="result-area" readonly placeholder="Generated content will appear here…"></textarea>
+            <div class="row gap" id="resultActions" style="display:none">
+              <button class="btn" id="saveToQueueBtn">Send to approval queue</button>
+              <button class="btn ghost" id="copyResultBtn">Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- APPROVAL QUEUE -->
+      <section class="view" id="view-queue">
+        <header class="view-header">
+          <div>
+            <h1>Approval queue</h1>
+            <p>Review, edit and approve content before it is considered ready to publish.</p>
+          </div>
+          <button class="btn" id="refreshQueueBtn">Refresh</button>
+        </header>
+        <div id="queueList" class="list"></div>
+      </section>
+
+      <!-- LIBRARY -->
+      <section class="view" id="view-library">
+        <header class="view-header">
+          <div>
+            <h1>Content library</h1>
+            <p>All generated and saved pieces with status and optional metrics.</p>
+          </div>
+        </header>
+        <div id="libraryList" class="list"></div>
+      </section>
+
+      <!-- AGENT BRAIN -->
+      <section class="view" id="view-agent">
+        <header class="view-header">
+          <div>
+            <h1>Agent brain</h1>
+            <p>General instructions, per-action rules, frequency and autonomy mode.</p>
+          </div>
+          <button class="btn primary" id="saveAgentBtn">Save configuration</button>
+        </header>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Mode & frequency</div>
+            <label class="field">
+              <span>Autonomy mode</span>
+              <select id="agentMode">
+                <option value="manual">Manual – I trigger everything</option>
+                <option value="semi-auto">Semi-auto – generate, wait for approval</option>
+                <option value="auto">Auto – generate & mark approved (use carefully)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Posting frequency</span>
+              <select id="agentFreq">
+                <option value="hourly">Hourly (aggressive)</option>
+                <option value="daily">Daily</option>
+                <option value="3x-week">3× per week</option>
+                <option value="weekly">Weekly</option>
+              </select>
+            </label>
+            <label class="field checkbox">
+              <input type="checkbox" id="agentApproval" checked>
+              <span>Require human approval before “published” status</span>
+            </label>
+            <div class="field">
+              <span>Enabled platforms</span>
+              <div class="chip-row" id="platformChips"></div>
+            </div>
+            <button class="btn" id="runTickBtn">Run agent tick now</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Instructions</div>
+            <label class="field">
+              <span>General instructions (always applied)</span>
+              <textarea id="agentGeneral" rows="5"></textarea>
+            </label>
+            <label class="field">
+              <span>createPost</span>
+              <textarea id="instr-createPost" rows="2"></textarea>
+            </label>
+            <label class="field">
+              <span>createImagePrompt</span>
+              <textarea id="instr-createImagePrompt" rows="2"></textarea>
+            </label>
+            <label class="field">
+              <span>createVideoScript</span>
+              <textarea id="instr-createVideoScript" rows="2"></textarea>
+            </label>
+            <label class="field">
+              <span>analyseGrowth</span>
+              <textarea id="instr-analyseGrowth" rows="2"></textarea>
+            </label>
+            <label class="field">
+              <span>learnFromOthers</span>
+              <textarea id="instr-learnFromOthers" rows="2"></textarea>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- GROWTH -->
+      <section class="view" id="view-growth">
+        <header class="view-header">
+          <div>
+            <h1>Growth & insights</h1>
+            <p>Track performance and let the agent suggest what to do next.</p>
+          </div>
+          <button class="btn primary" id="analyseGrowthBtn">Analyse & suggest</button>
+        </header>
+        <div class="card">
+          <div id="growthSummary" class="stats-row"></div>
+          <div id="growthInsights" class="insights-box">Run an analysis to see AI suggestions based on your current posts and metrics.</div>
+        </div>
+      </section>
+
+      <!-- LEARN -->
+      <section class="view" id="view-learn">
+        <header class="view-header">
+          <div>
+            <h1>Learn from others</h1>
+            <p>Paste public posts or describe successful content. The agent extracts patterns (no automatic scraping).</p>
+          </div>
+        </header>
+        <div class="card">
+          <label class="field">
+            <span>Paste posts / transcripts / descriptions</span>
+            <textarea id="learnText" rows="10" placeholder="Paste several successful posts, hooks, or your notes about competitor content…"></textarea>
+          </label>
+          <label class="field">
+            <span>Goal</span>
+            <input id="learnGoal" value="increase views and meaningful interaction">
+          </label>
+          <button class="btn primary" id="learnBtn">Extract patterns</button>
+          <div id="learnResult" class="insights-box hidden"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY -->
+      <section class="view" id="view-activity">
+        <header class="view-header">
+          <div>
+            <h1>Activity log</h1>
+            <p>Recent agent actions, generations and configuration changes.</p>
+          </div>
+        </header>
+        <div id="activityList" class="list"></div>
+      </section>
+
+      <!-- CONNECTIONS -->
+      <section class="view" id="view-connections">
+        <header class="view-header">
+          <div>
+            <h1>Account connections</h1>
+            <p>OAuth foundations for Meta, YouTube (Google) and TikTok. Real posting requires approved apps.</p>
+          </div>
+        </header>
+        <div class="card">
+          <p class="muted">This agent stores tokens encrypted at rest when you complete OAuth. Full automated publishing is limited by each platform’s policies and requires your own developer apps + review.</p>
+          <div id="connectionsList" class="list"></div>
+        </div>
+      </section>
+
+      <!-- DIAGNOSE -->
+      <section class="view" id="view-diagnose">
+        <header class="view-header">
+          <div>
+            <h1>Diagnostics</h1>
+            <p>Quick health checks for easy debugging.</p>
+          </div>
+          <button class="btn" id="runDiagnoseBtn">Run checks</button>
+        </header>
+        <div class="card">
+          <div id="diagnoseResult" class="insights-box">Click “Run checks”.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+</body>
+</html>
