@@ -80,6 +80,7 @@ $$('.nav-item').forEach(btn => {
     if (view === 'agent') loadAgentConfig();
     if (view === 'connections') loadConnections();
     if (view === 'growth') loadGrowthSummary();
+    if (view === 'schedule') loadSchedule();
   });
 });
 
@@ -584,6 +585,120 @@ async function loadConnections() {
     });
   } catch (err) { toast(err.message); }
 }
+
+// ---------- Schedule ----------
+async function loadSchedule() {
+  try {
+    const { schedule: items } = await api('/api/schedule');
+    const el = $('#scheduleList');
+    if (!items?.length) {
+      el.innerHTML = '<div class="card muted">No scheduled items.</div>';
+      return;
+    }
+    el.innerHTML = items.map(i => `
+      <div class="list-item">
+        <header>
+          <strong>${escapeHtml(i.provider || 'any')} · ${escapeHtml(i.status)}</strong>
+          <span class="meta">${new Date(i.runAt).toLocaleString()}</span>
+        </header>
+        <div class="meta">Post ${escapeHtml(i.postId)}${i.error ? ' · ' + escapeHtml(i.error) : ''}</div>
+        <div class="actions">
+          ${i.status === 'scheduled' ? `<button class="btn small ghost" data-cancel-sched="${i.id}">Cancel</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+    el.querySelectorAll('[data-cancel-sched]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          await api(`/api/schedule/${btn.dataset.cancelSched}`, { method: 'DELETE' });
+          toast('Cancelled');
+          loadSchedule();
+        } catch (err) { toast(err.message); }
+      });
+    });
+  } catch (err) { toast(err.message); }
+}
+
+$('#refreshScheduleBtn')?.addEventListener('click', loadSchedule);
+$('#schedCreateBtn')?.addEventListener('click', async () => {
+  try {
+    const postId = $('#schedPostId').value.trim();
+    const local = $('#schedRunAt').value;
+    if (!postId || !local) return toast('Post ID and datetime required');
+    const runAt = new Date(local).toISOString();
+    await api('/api/schedule', {
+      method: 'POST',
+      body: JSON.stringify({
+        postId,
+        runAt,
+        provider: $('#schedProvider').value,
+        mediaUrl: $('#schedMediaUrl').value.trim() || undefined
+      })
+    });
+    toast('Scheduled');
+    loadSchedule();
+  } catch (err) { toast(err.message); }
+});
+
+// ---------- Comment suggestions ----------
+$('#commentSuggestBtn')?.addEventListener('click', async () => {
+  const btn = $('#commentSuggestBtn');
+  btn.disabled = true;
+  try {
+    const data = await api('/api/comments/suggest', {
+      method: 'POST',
+      body: JSON.stringify({
+        originalPost: $('#commentPostCtx').value,
+        comment: $('#commentText').value,
+        platform: $('#commentPlatform').value
+      })
+    });
+    const box = $('#commentResults');
+    box.classList.remove('hidden');
+    box.innerHTML = (data.replies || []).map((r, i) =>
+      `<div style="margin-bottom:10px"><strong>${i + 1}.</strong> ${escapeHtml(r)}
+       <button class="btn small ghost" data-copy="${escapeHtml(r)}" style="margin-left:8px">Copy</button></div>`
+    ).join('') || escapeHtml(data.raw || 'No replies');
+    box.querySelectorAll('[data-copy]').forEach(b => {
+      b.addEventListener('click', () => {
+        navigator.clipboard.writeText(b.dataset.copy);
+        toast('Copied');
+      });
+    });
+  } catch (err) { toast(err.message); }
+  finally { btn.disabled = false; }
+});
+
+// ---------- Image generation ----------
+$('#imageGenBtn')?.addEventListener('click', async () => {
+  const btn = $('#imageGenBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  const box = $('#imageResult');
+  box.classList.remove('hidden');
+  box.textContent = 'Working…';
+  try {
+    const data = await api('/api/images/generate', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: $('#imagePrompt').value,
+        postId: $('#imagePostId').value.trim() || undefined
+      })
+    });
+    if (data.relativeUrl) {
+      box.innerHTML = `<p>Saved · model ${escapeHtml(data.model || '')}</p>
+        <img src="${data.relativeUrl}" alt="generated" style="max-width:100%;border-radius:12px;margin-top:10px">
+        <p class="meta">${escapeHtml(data.relativeUrl)}</p>`;
+    } else {
+      box.textContent = JSON.stringify(data, null, 2);
+    }
+  } catch (err) {
+    box.textContent = err.message + (err.code ? ` (${err.code})` : '');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generate image';
+  }
+});
 
 // ---------- Diagnostics ----------
 $('#runDiagnoseBtn')?.addEventListener('click', async () => {

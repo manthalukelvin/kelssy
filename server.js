@@ -16,6 +16,9 @@ import * as metaOAuth from './services/oauth-meta.js';
 import * as tiktokOAuth from './services/oauth-tiktok.js';
 import * as publish from './services/publish.js';
 import { saveUpload, UPLOADS_DIR, ensureUploadsDir } from './services/uploads.js';
+import * as schedule from './services/schedule.js';
+import { suggestReplies } from './services/comments.js';
+import { generateImageFromPrompt } from './services/images.js';
 import multer from 'multer';
 import { signSession } from './lib/crypto.js';
 
@@ -477,6 +480,99 @@ app.post('/api/upload', upload.single('file'), async (req, res, next) => {
 ensureUploadsDir().catch(() => {});
 app.use('/uploads', express.static(UPLOADS_DIR, { fallthrough: false, maxAge: '1h' }));
 
+// ---------- Schedule (exact times) ----------
+app.get('/api/schedule', async (_req, res, next) => {
+  try {
+    const items = await schedule.listSchedule();
+    res.json({ schedule: items });
+  } catch (err) { next(err); }
+});
+
+app.post('/api/schedule', async (req, res, next) => {
+  try {
+    const item = await schedule.schedulePost(req.body || {});
+    res.json({ item });
+  } catch (err) { next(err); }
+});
+
+app.delete('/api/schedule/:id', async (req, res, next) => {
+  try {
+    const result = await schedule.cancelSchedule(req.params.id);
+    res.json(result);
+  } catch (err) { next(err); }
+});
+
+// ---------- Comment reply suggestions ----------
+app.post('/api/comments/suggest', async (req, res, next) => {
+  try {
+    const result = await suggestReplies(req.body || {});
+    res.json(result);
+  } catch (err) { next(err); }
+});
+
+// ---------- Image generation from prompt ----------
+app.post('/api/images/generate', async (req, res, next) => {
+  try {
+    const prompt = String(req.body?.prompt || '').trim();
+    const postId = req.body?.postId || null;
+    if (prompt.length < 8) {
+      return res.status(400).json({ error: 'prompt is required (min ~8 chars)' });
+    }
+    const result = await generateImageFromPrompt(prompt, { postId });
+
+    // Attach to post if requested
+    if (postId && result.path) {
+      const posts = await readPosts();
+      const idx = posts.findIndex(p => p.id === postId);
+      if (idx >= 0) {
+        posts[idx].localMediaPath = result.path;
+        posts[idx].localMediaUrl = result.relativeUrl;
+        posts[idx].mediaType = 'IMAGE';
+        posts[idx].updatedAt = new Date().toISOString();
+        await writePosts(posts);
+      }
+    }
+    res.json(result);
+  } catch (err) { next(err); }
+});
+
+// ---------- Cron / 24-7 tick (protect with CRON_SECRET if set) ----------
+app.post('/api/cron/tick', async (req, res, next) => {
+  try {
+    const secret = process.env.CRON_SECRET;
+    if (secret) {
+      const hdr = req.headers['x-cron-secret'] || req.query.secret;
+      if (hdr !== secret) {
+        return res.status(401).json({ error: 'Invalid cron secret' });
+      }
+    }
+    // 1) Process due scheduled posts
+    const due = await schedule.processDueSchedule({ limit: 5 });
+    // 2) Optional agent content tick
+    const force = Boolean(req.body?.force || req.query.force);
+    const tick = await agent.runAgentTick({ force });
+    res.json({ ok: true, schedule: due, agentTick: tick, at: new Date().toISOString() });
+  } catch (err) { next(err); }
+});
+
+// Also allow GET for simple cron providers
+app.get('/api/cron/tick', async (req, res, next) => {
+  req.body = {};
+  // reuse POST handler logic via internal call pattern
+  try {
+    const secret = process.env.CRON_SECRET;
+    if (secret) {
+      const hdr = req.headers['x-cron-secret'] || req.query.secret;
+      if (hdr !== secret) {
+        return res.status(401).json({ error: 'Invalid cron secret' });
+      }
+    }
+    const due = await schedule.processDueSchedule({ limit: 5 });
+    const tick = await agent.runAgentTick({ force: req.query.force === '1' });
+    res.json({ ok: true, schedule: due, agentTick: tick, at: new Date().toISOString() });
+  } catch (err) { next(err); }
+});
+
 // ---------- Diagnostics ----------
 app.get('/api/diagnose', async (_req, res) => {
   const checks = [];
@@ -567,7 +663,7 @@ app.get('/api/meta', (_req, res) => {
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
 // Catch-all for SPA-style
-app.get('*', (req, res, next) => {
+app.get('/{*path}', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

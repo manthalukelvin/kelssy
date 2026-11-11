@@ -49,6 +49,9 @@
         <button class="nav-item" data-view="agent"><span>◈</span> Agent brain</button>
         <button class="nav-item" data-view="growth"><span>↗</span> Growth & insights</button>
         <button class="nav-item" data-view="learn"><span>◎</span> Learn from others</button>
+        <button class="nav-item" data-view="schedule"><span>⏱</span> Schedule</button>
+        <button class="nav-item" data-view="comments"><span>💬</span> Reply suggestions</button>
+        <button class="nav-item" data-view="images"><span>🖼</span> Image studio</button>
         <button class="nav-item" data-view="activity"><span>≡</span> Activity log</button>
         <button class="nav-item" data-view="connections"><span>⇄</span> Connections</button>
         <button class="nav-item" data-view="diagnose"><span>⚙</span> Diagnostics</button>
@@ -265,6 +268,96 @@
           </label>
           <button class="btn primary" id="learnBtn">Extract patterns</button>
           <div id="learnResult" class="insights-box hidden"></div>
+        </div>
+      </section>
+
+      <!-- SCHEDULE -->
+      <section class="view" id="view-schedule">
+        <header class="view-header">
+          <div>
+            <h1>Schedule</h1>
+            <p>Set exact publish times. Cron / agent tick processes due items.</p>
+          </div>
+          <button class="btn" id="refreshScheduleBtn">Refresh</button>
+        </header>
+        <div class="card" style="margin-bottom:16px">
+          <div class="form-grid">
+            <label class="field">
+              <span>Post ID (from library)</span>
+              <input id="schedPostId" placeholder="uuid of approved post">
+            </label>
+            <label class="field">
+              <span>Run at (local datetime)</span>
+              <input id="schedRunAt" type="datetime-local">
+            </label>
+            <label class="field">
+              <span>Provider</span>
+              <select id="schedProvider">
+                <option value="meta">Instagram</option>
+                <option value="tiktok">TikTok</option>
+                <option value="youtube">YouTube</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Media URL (optional)</span>
+              <input id="schedMediaUrl" placeholder="https://...">
+            </label>
+          </div>
+          <button class="btn primary" id="schedCreateBtn">Schedule</button>
+        </div>
+        <div id="scheduleList" class="list"></div>
+      </section>
+
+      <!-- COMMENTS -->
+      <section class="view" id="view-comments">
+        <header class="view-header">
+          <div>
+            <h1>Reply suggestions</h1>
+            <p>Paste a comment and get authentic reply options to copy.</p>
+          </div>
+        </header>
+        <div class="card">
+          <label class="field">
+            <span>Original post (optional context)</span>
+            <textarea id="commentPostCtx" rows="2"></textarea>
+          </label>
+          <label class="field">
+            <span>Incoming comment</span>
+            <textarea id="commentText" rows="3" placeholder="Thanks for this! How do I get started?"></textarea>
+          </label>
+          <label class="field">
+            <span>Platform</span>
+            <select id="commentPlatform">
+              <option>Instagram</option>
+              <option>TikTok</option>
+              <option>YouTube</option>
+              <option>Facebook</option>
+            </select>
+          </label>
+          <button class="btn primary" id="commentSuggestBtn">Suggest replies</button>
+          <div id="commentResults" class="insights-box hidden" style="margin-top:14px"></div>
+        </div>
+      </section>
+
+      <!-- IMAGES -->
+      <section class="view" id="view-images">
+        <header class="view-header">
+          <div>
+            <h1>Image studio</h1>
+            <p>Generate visuals from a prompt (requires an image-capable Gemini model).</p>
+          </div>
+        </header>
+        <div class="card">
+          <label class="field">
+            <span>Image prompt</span>
+            <textarea id="imagePrompt" rows="4" placeholder="Clean minimalist desk setup, soft morning light, personal brand aesthetic…"></textarea>
+          </label>
+          <label class="field">
+            <span>Attach to post ID (optional)</span>
+            <input id="imagePostId" placeholder="uuid">
+          </label>
+          <button class="btn primary" id="imageGenBtn">Generate image</button>
+          <div id="imageResult" class="insights-box hidden" style="margin-top:14px"></div>
         </div>
       </section>
 
