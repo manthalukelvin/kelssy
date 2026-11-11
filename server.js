@@ -14,6 +14,7 @@ import * as agent from './services/agent.js';
 import * as googleOAuth from './services/oauth-google.js';
 import * as metaOAuth from './services/oauth-meta.js';
 import * as tiktokOAuth from './services/oauth-tiktok.js';
+import * as facebookOAuth from './services/oauth-facebook.js';
 import * as publish from './services/publish.js';
 import { saveUpload, UPLOADS_DIR, ensureUploadsDir } from './services/uploads.js';
 import * as schedule from './services/schedule.js';
@@ -89,8 +90,11 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// All routes below require authentication
-app.use(requireAuth);
+// Protect API only — never block the dashboard HTML/CSS/JS or /uploads
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api')) return next();
+  return requireAuth(req, res, next);
+});
 
 // ---------- Agent config ----------
 app.get('/api/agent/config', async (_req, res, next) => {
@@ -294,7 +298,8 @@ app.get('/api/connections', async (_req, res, next) => {
       connections: safe,
       googleConfigured: googleOAuth.isGoogleConfigured(),
       metaConfigured: metaOAuth.isMetaConfigured(),
-      tiktokConfigured: tiktokOAuth.isTikTokConfigured()
+      tiktokConfigured: tiktokOAuth.isTikTokConfigured(),
+      facebookConfigured: facebookOAuth.isFacebookConfigured()
     });
   } catch (err) { next(err); }
 });
@@ -312,6 +317,10 @@ app.get('/api/oauth/:provider/start', (req, res, next) => {
     }
     if (provider === 'tiktok') {
       const { url } = tiktokOAuth.startTikTokOAuth();
+      return res.redirect(url);
+    }
+    if (provider === 'facebook') {
+      const { url } = facebookOAuth.startFacebookOAuth();
       return res.redirect(url);
     }
     return res.status(404).json({ error: 'Unsupported provider' });
@@ -361,10 +370,41 @@ app.get('/api/oauth/tiktok/callback', async (req, res) => {
   }
 });
 
+app.get('/api/oauth/facebook/callback', async (req, res) => {
+  try {
+    const { code, state, error, error_description } = req.query;
+    const record = await facebookOAuth.handleFacebookCallback({
+      code: String(code || ''),
+      state: String(state || ''),
+      error: error ? String(error) : null,
+      error_description: error_description ? String(error_description) : null
+    });
+    res.status(200).send(oauthSuccessPage('Facebook Page connected', record.accountName));
+  } catch (err) {
+    res.status(err.status || 500).send(oauthErrorPage(err.message || 'OAuth failed'));
+  }
+});
+
+app.get('/api/facebook/page', async (_req, res, next) => {
+  try {
+    const info = await facebookOAuth.fetchFacebookPageInfo();
+    res.json(info);
+  } catch (err) { next(err); }
+});
+
+app.post('/api/facebook/select-page', async (req, res, next) => {
+  try {
+    const pageId = String(req.body?.pageId || '');
+    if (!pageId) return res.status(400).json({ error: 'pageId required' });
+    const result = await facebookOAuth.selectFacebookPage(pageId);
+    res.json(result);
+  } catch (err) { next(err); }
+});
+
 app.post('/api/connections/:provider/disconnect', async (req, res, next) => {
   try {
     const provider = req.params.provider;
-    if (!['google', 'meta', 'tiktok'].includes(provider)) {
+    if (!['google', 'meta', 'tiktok', 'facebook'].includes(provider)) {
       return res.status(404).json({ error: 'Unknown provider' });
     }
     const saved = await readConnections();
@@ -419,8 +459,8 @@ app.post('/api/publish/:postId', async (req, res, next) => {
       title
     } = req.body || {};
 
-    if (!provider || !['meta', 'instagram', 'tiktok', 'youtube'].includes(provider)) {
-      return res.status(400).json({ error: 'provider must be meta, tiktok, or youtube' });
+    if (!provider || !['meta', 'instagram', 'tiktok', 'youtube', 'facebook'].includes(provider)) {
+      return res.status(400).json({ error: 'provider must be meta, tiktok, youtube, or facebook' });
     }
 
     const result = await publish.publishPost({
@@ -662,7 +702,7 @@ app.get('/api/meta', (_req, res) => {
 // Static frontend
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
-// Catch-all for SPA-style
+// Catch-all for SPA-style (Express 5 / path-to-regexp requires a named wildcard)
 app.get('/{*path}', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

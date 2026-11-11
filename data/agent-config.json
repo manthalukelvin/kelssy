@@ -1,0 +1,30 @@
+{
+  "mode": "semi-auto",
+  "approvalRequired": true,
+  "postingFrequency": "daily",
+  "customCron": null,
+  "platformsEnabled": [
+    "Facebook",
+    "TikTok",
+    "YouTube"
+  ],
+  "generalInstructions": "You are an expert personal-brand growth agent. Prioritise authenticity, value, and platform-native formats. Never invent metrics, testimonials or medical claims.",
+  "actionInstructions": {
+    "createPost": "Write concise, high-hook content. Include a soft CTA when appropriate.",
+    "createImagePrompt": "Describe a clean, professional visual that matches the brand tone.",
+    "createVideoScript": "Structure with strong hook (first 3s), value body, and clear ending CTA.",
+    "analyseGrowth": "Be data-driven and give 3 concrete next actions.",
+    "learnFromOthers": "Extract patterns that increase views and meaningful interaction. Avoid copying."
+  },
+  "learningSources": [
+    {
+      "id": "ec54aa76-d98e-4a38-b3e6-5c4d3bd0edad",
+      "at": "2026-11-11T23:30:25.317Z",
+      "preview": "**TikTok Video Script**\n\n**Topic:** Overcoming \"laziness\" without self-guilt  \n**Tone:** Authentic, clear, relatable  \n\n---\n\n**[HOOK]**  \n*(Visual: On-screen text reads \"Read this if you feel lazy rig",
+      "analysisPreview": "Here is the analysis of the provided content, highlighting actionable patterns, ethical takeaways, pitfalls to avoid, and tailored content ideas for your personal brand across TikTok, YouTube Shorts, and Facebook Reels.\n\n---\n\n### 1. Key Patterns That Drive Views & Interaction\n\n* **The Immediate Stat"
+    }
+  ],
+  "lastRunAt": "2026-11-11T23:29:20.917Z",
+  "createdAt": "2026-11-11T22:47:05.126Z",
+  "updatedAt": "2026-11-11T23:30:25.317Z"
+}

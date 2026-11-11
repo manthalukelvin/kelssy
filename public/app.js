@@ -159,6 +159,7 @@ async function loadPosts() {
             ${p.status === 'approved' || p.status === 'published' ? `
               <button class="btn small" data-action="attach-media">Attach media</button>
               <button class="btn small primary" data-action="publish-meta">→ Instagram</button>
+              <button class="btn small primary" data-action="publish-facebook">→ Facebook Page</button>
               <button class="btn small primary" data-action="publish-tiktok">→ TikTok</button>
               <button class="btn small primary" data-action="publish-youtube">→ YouTube</button>
             ` : ''}
@@ -211,17 +212,24 @@ async function loadPosts() {
               input.click();
               return;
             }
-            if (action === 'publish-meta' || action === 'publish-tiktok' || action === 'publish-youtube') {
-              const provider = action === 'publish-meta' ? 'meta' : action === 'publish-tiktok' ? 'tiktok' : 'youtube';
+            if (action === 'publish-meta' || action === 'publish-tiktok' || action === 'publish-youtube' || action === 'publish-facebook') {
+              const provider = action === 'publish-meta' ? 'meta'
+                : action === 'publish-tiktok' ? 'tiktok'
+                : action === 'publish-facebook' ? 'facebook'
+                : 'youtube';
               let mediaUrl = null;
               let mediaType = 'IMAGE';
               let privacyLevel = provider === 'tiktok' ? 'SELF_ONLY' : 'unlisted';
               let localPath = null;
 
               if (provider === 'youtube') {
-                // Prefer already-attached local file; otherwise prompt for path is not possible in browser —
-                // user must Attach media first.
                 privacyLevel = prompt('YouTube privacy: unlisted, public, or private', 'unlisted') || 'unlisted';
+              } else if (provider === 'facebook') {
+                mediaUrl = prompt('Optional public HTTPS image URL (leave empty for text-only post):', '') || null;
+                if (mediaUrl && !/^https:\/\//i.test(mediaUrl)) {
+                  toast('URL must start with https://');
+                  return;
+                }
               } else {
                 mediaUrl = prompt(
                   'Public HTTPS media URL (leave empty to use attached upload + PUBLIC_BASE_URL):',
@@ -250,6 +258,7 @@ async function loadPosts() {
                 });
                 if (provider === 'meta') toast(`Instagram · ${result.mediaId}`);
                 else if (provider === 'tiktok') toast(`TikTok · ${result.publishId}`);
+                else if (provider === 'facebook') toast(`Facebook Page · ${result.postId}`);
                 else toast(`YouTube · ${result.videoId || result.url}`);
                 loadPosts();
               } catch (err) {
@@ -423,7 +432,7 @@ async function loadActivity() {
 async function loadConnections() {
   try {
     const data = await api('/api/connections');
-    const { connections, googleConfigured, metaConfigured, tiktokConfigured } = data;
+    const { connections, googleConfigured, metaConfigured, tiktokConfigured, facebookConfigured } = data;
     const el = $('#connectionsList');
     const cards = [];
 
@@ -480,6 +489,35 @@ async function loadConnections() {
             : `<button class="btn small primary" data-connect="meta" ${metaConfigured ? '' : 'disabled'}>Connect Instagram</button>`}
         </div>
         <div class="insights-box hidden" id="metaProfileBox" style="margin-top:12px"></div>
+      </div>
+    `);
+
+    // ----- Facebook Page -----
+    const fb = connections.facebook;
+    cards.push(`
+      <div class="list-item" data-provider="facebook">
+        <header>
+          <strong>Facebook Page</strong>
+          <span class="badge ${fb ? 'approved' : ''}">${fb ? 'Connected' : 'Not connected'}</span>
+        </header>
+        <div class="meta">
+          ${fb
+            ? `Page: <strong>${escapeHtml(fb.accountName || 'Facebook Page')}</strong>
+               ${fb.extra?.pageCount ? ` · ${fb.extra.pageCount} page(s) available` : ''}
+               ${fb.extra?.category ? ` · ${escapeHtml(fb.extra.category)}` : ''}
+               <br>Connected at ${fb.connectedAt ? new Date(fb.connectedAt).toLocaleString() : '—'}
+               <br><span style="opacity:.8">Publishing needs pages_manage_posts (App Review for live mode).</span>`
+            : (facebookConfigured
+                ? 'Uses the same Meta app credentials. Click Connect, then pick a Page you manage.'
+                : 'Add META_APP_ID + META_APP_SECRET (same as Instagram) and register Facebook redirect URI.')}
+        </div>
+        <div class="actions">
+          ${fb
+            ? `<button class="btn small" data-action="fb-page">Refresh page info</button>
+               <button class="btn small ghost" data-disconnect="facebook">Disconnect</button>`
+            : `<button class="btn small primary" data-connect="facebook" ${facebookConfigured ? '' : 'disabled'}>Connect Facebook Page</button>`}
+        </div>
+        <div class="insights-box hidden" id="fbPageBox" style="margin-top:12px"></div>
       </div>
     `);
 
@@ -581,6 +619,21 @@ async function loadConnections() {
           `Videos: ${profile.videoCount ?? '—'}`,
           profile.bio ? `\n${profile.bio}` : ''
         ].join('\n');
+      } catch (err) { box.textContent = err.message; }
+    });
+
+    el.querySelector('[data-action="fb-page"]')?.addEventListener('click', async () => {
+      const box = $('#fbPageBox');
+      box.classList.remove('hidden');
+      box.textContent = 'Loading…';
+      try {
+        const { page } = await api('/api/facebook/page');
+        box.textContent = [
+          `Name: ${page.name || '—'}`,
+          `Category: ${page.category || '—'}`,
+          `Followers: ${page.followersCount ?? page.fanCount ?? '—'}`,
+          page.link ? `Link: ${page.link}` : ''
+        ].filter(Boolean).join('\n');
       } catch (err) { box.textContent = err.message; }
     });
   } catch (err) { toast(err.message); }

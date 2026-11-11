@@ -1,0 +1,31 @@
+{
+  "snapshots": [],
+  "suggestions": [
+    {
+      "id": "7f4e8392-b2fc-4378-adc7-fbdc920a9b53",
+      "at": "2026-11-11T23:29:38.567Z",
+      "brand": "All",
+      "insights": "### 1. Honest Diagnosis\n\n* **What is working:**\n  * **Strong, relatable hooks:** The positioning around mindset shifts (*“clarity problem, not a laziness problem”* and *“changing everything at once”*) touches on high-empathy pain points that drive comments and shares.\n  * **Authentic voice:** Content feels honest, personal, and non-preachy, which builds trust on personal brand channels.\n\n* **What is not / Current gaps:**\n  * **Data blindspot:** `metrics: null` across all posts. Without tracking views, retention, and engagement rate, optimization is based on guesswork.\n  * **Platform imbalance:** 3 Facebook posts, 1 TikTok script, and **0 YouTube posts**, missing out on YouTube Shorts reach.\n  * **Format limitations:** Heavily weighted toward text posts on Facebook; needs more platform-native short-form video execution for TikTok and YouTube.\n\n---\n\n### 2. 5 Concrete, Prioritised Suggestions to Increase Views & Interaction\n\n> **Top 3 Immediate Actions:**\n\n1. **Implement Baseline Performance Tracking (Action #1)**\n   * Set up metric tracking (Views, Retention/Watch Time, Comments, Shares) for live posts after 24–48 hours to identify high-performing content themes.\n\n2. **Repurpose TikTok Content into YouTube Shorts (Action #2)**\n   * Take approved TikTok scripts (e.g., *“Overcoming laziness without self-guilt”*) and adapt them directly for YouTube Shorts to activate your third preferred platform.\n\n3. **Add Native Engagement Prompts to Facebook Posts (Action #3)**\n   * End text posts with single, low-friction questions instead of passive sign-offs. \n   * *Example:* \"What’s the one task on your to-do list you're putting off today?\"\n\n---\n\n> **Additional Suggestions:**\n\n4. **Convert Text Hits into Video Hooks**\n   * Turn the highest-performing Facebook text lines (e.g., *\"I used to think I had a laziness problem...\"*) into 30–45 second spoken-to-camera videos for TikTok and YouTube Shorts.\n\n5. **Clear Pending Approval Bottlenecks**\n   * Review and publish the pending Facebook post on \"changing everything at once\" to maintain consistent output without gaps.\n\n---\n\n### 3. Recommended",
+      "snapshot": {
+        "totalPosts": 4,
+        "approved": 3,
+        "pending": 1,
+        "tracked": 0,
+        "totals": {}
+      }
+    },
+    {
+      "id": "366460ca-9993-49ee-b4c7-303853998678",
+      "at": "2026-11-11T22:03:13.917Z",
+      "brand": "All",
+      "insights": "### 1. Honest Diagnosis\n\n* **What’s Working:** \n  * **Strong Hook & Audience Targeting:** The post immediately calls out a specific target persona (*\"To every student scrolling right now...\"*) and uses empathetic, relatable language that builds rapport.\n* **What’s Not Working / Current Gaps:**\n  * **Insufficient Sample Size & Missing Data:** With only 1 post published and 0 metrics tracked, there is no quantitative baseline (reach, engagement rate, saves, or shares) to measure performance.\n  * **Single-Channel Reliance:** Content is currently limited to Facebook text, leaving high-reach platforms (TikTok, YouTube Shorts) unutilised.\n\n---\n\n### 2. 5 Concrete, Prioritised Suggestions\n\n1. **Repurpose Hook to Vertical Video (TikTok & YouTube Shorts):** Film a 30–45 second video speaking directly to the camera using the exact same opening line. Short-form video will drastically accelerate initial brand discovery.\n2. **Add Low-Friction Engagement Prompts:** Include a specific, low-effort question at the end of posts (e.g., *\"What’s the main assignment you’re avoiding today? Drop it below and let’s tackle it.\"*) to boost comment signals.\n3. **Establish Baseline Metric Tracking:** Enable tracking on Facebook to monitor **Shares** and **Saves** (key indicators of valuable content) rather than just likes.\n4. **Introduce Visual Anchors on Facebook:** Plain text posts often get buried. Pair message-driven posts with high-contrast text graphics, simple carousels, or candid personal photos.\n5. **Launch a Specific 3-Part Micro-Series:** Group content into a clear topic series (e.g., *\"3 Procrastination Fixes for Students\"*). Series structure increases multi-post viewing behavior across platforms.\n\n---\n\n### 3. Recommended 7-Day Posting Schedule & Content Mix\n\n#### Platform Strategy:\n* **TikTok & YouTube Shorts:** 1 short-form video per day (7 total)\n* **Facebook:** 4 posts per week (Text + Image/Carousel formats)\n\n#### Content Mix Ratio:\n* **50% Relatable Empathy & Mindset:** Authentic stories, shared student struggles, and mindset shifts.\n* **30% Tactical Value & Hacks:** Actionable study strategies, tools, and productivity workflows.\n* **20% Community & Q&A:** Direct questions, poll-style posts, and responding to audience comments.\n\n---\n\n### 3 Concrete Next Actions (Awaiting Approval)\n\n1. **Track Post #1:** Pull and log engagement data (impressions, comments, shares) for the initial Facebook post to set our baseline benchmark.\n2. **Produce Video Script #1:** Draft a short-form video script (Hook / Body / CTA) adapted from the student scrolling post for TikTok and YouTube Shorts.\n3. **Queue 3 Facebook Drafts:** Draft 3 complementary Facebook posts featuring actionable study/procrastination tips for your review.",
+      "snapshot": {
+        "totalPosts": 1,
+        "approved": 1,
+        "pending": 0,
+        "tracked": 0,
+        "totals": {}
+      }
+    }
+  ]
+}

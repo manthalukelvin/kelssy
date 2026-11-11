@@ -1,0 +1,201 @@
+[
+  {
+    "id": "5c99d59d-600d-4d52-836c-fce66b11ca9e",
+    "at": "2026-11-11T23:32:58.154Z",
+    "type": "content_generated",
+    "summary": "Generated post for Facebook",
+    "data": {
+      "postId": "b0d2af83-c0f6-4e79-a4f5-5ad84771bea0",
+      "platform": "Facebook",
+      "contentType": "post"
+    }
+  },
+  {
+    "id": "eb8d4a72-58cd-43cd-ad93-1e91cb4b6681",
+    "at": "2026-11-11T23:30:25.328Z",
+    "type": "learning",
+    "summary": "Analysed external posts for growth patterns"
+  },
+  {
+    "id": "d5c88985-c275-4391-8668-f43fac328279",
+    "at": "2026-11-11T23:29:38.578Z",
+    "type": "growth_analysis",
+    "summary": "Ran growth analysis + suggestions"
+  },
+  {
+    "id": "6c940b94-fb06-459a-bbde-3be524058406",
+    "at": "2026-11-11T23:29:20.925Z",
+    "type": "agent_tick",
+    "summary": "Agent tick created reel-script for TikTok",
+    "data": {
+      "postId": "807cc50f-bfb6-497d-95f3-ac76f27e5e6a"
+    }
+  },
+  {
+    "id": "76839947-63d9-4f2b-b920-f8ec78b87f10",
+    "at": "2026-11-11T23:29:20.914Z",
+    "type": "content_generated",
+    "summary": "Generated reel-script for TikTok",
+    "data": {
+      "postId": "807cc50f-bfb6-497d-95f3-ac76f27e5e6a",
+      "platform": "TikTok",
+      "contentType": "reel-script"
+    }
+  },
+  {
+    "id": "5f77b397-e66d-4db8-8e63-241dc6b45b58",
+    "at": "2026-11-11T23:28:56.931Z",
+    "type": "agent_tick",
+    "summary": "Agent tick created post for Facebook",
+    "data": {
+      "postId": "80a60aa3-0f34-4ed8-aec7-5bfee54be2d2"
+    }
+  },
+  {
+    "id": "22b1222f-6c9c-46bc-a8aa-389536ee8ad0",
+    "at": "2026-11-11T23:28:56.920Z",
+    "type": "content_generated",
+    "summary": "Generated post for Facebook",
+    "data": {
+      "postId": "80a60aa3-0f34-4ed8-aec7-5bfee54be2d2",
+      "platform": "Facebook",
+      "contentType": "post"
+    }
+  },
+  {
+    "id": "b86028b5-0d03-4a49-b8f3-4c6c7b0cf1e1",
+    "at": "2026-11-11T23:28:56.336Z",
+    "type": "config_update",
+    "summary": "Agent configuration updated",
+    "data": {
+      "keys": [
+        "mode",
+        "approvalRequired",
+        "postingFrequency",
+        "platformsEnabled",
+        "generalInstructions",
+        "actionInstructions"
+      ]
+    }
+  },
+  {
+    "id": "aeba38da-8be3-431b-8b21-43c9e67d3cce",
+    "at": "2026-11-11T23:28:05.060Z",
+    "type": "post_update",
+    "summary": "Updated post 4bfafa45-efca-44d1-b0c3-f672d0be962f",
+    "data": {
+      "status": "approved"
+    }
+  },
+  {
+    "id": "3ebaedb2-d05f-43b4-a68e-7bee1636ebc6",
+    "at": "2026-11-11T23:26:20.061Z",
+    "type": "post_update",
+    "summary": "Updated post 3d4054ca-3b65-4ff1-9154-2a5ca514a614",
+    "data": {
+      "status": "approved"
+    }
+  },
+  {
+    "id": "3d0c742c-282d-4c87-9bcb-3b5339e4807a",
+    "at": "2026-11-11T23:25:42.239Z",
+    "type": "content_generated",
+    "summary": "Generated post for Facebook",
+    "data": {
+      "postId": "3d4054ca-3b65-4ff1-9154-2a5ca514a614",
+      "platform": "Facebook",
+      "contentType": "post"
+    }
+  },
+  {
+    "id": "7cea63dd-1ae7-48d8-8083-473841d01055",
+    "at": "2026-11-11T23:25:10.745Z",
+    "type": "content_generated",
+    "summary": "Generated post for TikTok",
+    "data": {
+      "postId": "4bfafa45-efca-44d1-b0c3-f672d0be962f",
+      "platform": "TikTok",
+      "contentType": "post"
+    }
+  },
+  {
+    "id": "99dc1630-c852-4587-84b8-0341f0d21d65",
+    "at": "2026-11-11T23:04:41.451Z",
+    "type": "oauth_connect",
+    "summary": "Connected YouTube / Google as Celma Tech",
+    "data": {
+      "email": "techcelma@gmail.com"
+    }
+  },
+  {
+    "id": "b1d6f102-f625-4635-bb49-5bde697e9012",
+    "at": "2026-11-11T23:03:43.992Z",
+    "type": "disconnect",
+    "summary": "Disconnected google"
+  },
+  {
+    "id": "2c581a5a-f256-46ec-abd7-a4255dd4a97b",
+    "at": "2026-11-11T22:56:59.415Z",
+    "type": "oauth_connect",
+    "summary": "Connected YouTube / Google as Kelvin Manthalu",
+    "data": {
+      "email": "manthalukelv@gmail.com"
+    }
+  },
+  {
+    "id": "5459c174-8b0d-48d7-8e6d-3be3dd5537ea",
+    "at": "2026-11-11T22:51:01.759Z",
+    "type": "auth_ok",
+    "summary": "Successful login"
+  },
+  {
+    "id": "8c4db51b-1d77-4b5d-b54f-b1725dd46706",
+    "at": "2026-11-11T22:47:35.601Z",
+    "type": "auth_ok",
+    "summary": "Successful login"
+  },
+  {
+    "id": "e56a9e99-8f76-4dbe-9856-2631162a7d15",
+    "at": "2026-11-11T22:47:30.465Z",
+    "type": "auth_fail",
+    "summary": "Failed login attempt"
+  },
+  {
+    "id": "6474bd1c-7fd3-412e-9ccd-b759c63fe262",
+    "at": "2026-11-11T22:03:13.937Z",
+    "type": "growth_analysis",
+    "summary": "Ran growth analysis + suggestions"
+  },
+  {
+    "id": "e92f9658-e0f6-4e38-9c92-894623dc0973",
+    "at": "2026-11-11T22:01:22.546Z",
+    "type": "post_update",
+    "summary": "Updated post fbcb1f8a-9b61-4a0b-8bbb-3e90d4a1b678",
+    "data": {
+      "status": "approved"
+    }
+  },
+  {
+    "id": "5e18ec4f-f381-4580-815b-617093f5c075",
+    "at": "2026-11-11T21:59:25.072Z",
+    "type": "content_generated",
+    "summary": "Generated post for Facebook",
+    "data": {
+      "postId": "fbcb1f8a-9b61-4a0b-8bbb-3e90d4a1b678",
+      "platform": "Facebook",
+      "contentType": "post"
+    }
+  },
+  {
+    "id": "de1df790-cc76-420a-bb65-157e09e67a9a",
+    "at": "2026-11-11T21:58:41.200Z",
+    "type": "auth_ok",
+    "summary": "Successful login"
+  },
+  {
+    "id": "9ec9072b-93b0-49e7-b20f-7e9f862b9cf4",
+    "at": "2026-11-11T21:58:22.139Z",
+    "type": "auth_fail",
+    "summary": "Failed login attempt"
+  }
+]

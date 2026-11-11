@@ -285,6 +285,92 @@ export async function publishToTikTok({
 }
 
 /**
+ * Publish a text (and optional link/photo) post to a Facebook Page
+ */
+export async function publishToFacebook({ postId, mediaUrl, force = false, link = null }) {
+  const { post, posts } = await getPostOrThrow(postId);
+
+  if (!force && post.status !== 'approved' && post.status !== 'published') {
+    const err = new Error('Post must be approved before publishing.');
+    err.status = 400;
+    err.code = 'NOT_APPROVED';
+    throw err;
+  }
+
+  const { getFacebookPageToken } = await import('./oauth-facebook.js');
+  const { accessToken, pageId, pageName } = await getFacebookPageToken();
+
+  const message = (post.content || '').slice(0, 8000);
+  let resultId = null;
+  let endpoint = 'feed';
+
+  // Photo post if image URL provided
+  if (mediaUrl && /^https:\/\//i.test(mediaUrl) && /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(mediaUrl)) {
+    endpoint = 'photos';
+    const body = new URLSearchParams({
+      url: mediaUrl,
+      caption: message,
+      access_token: accessToken
+    });
+    const res = await fetch(`https://graph.facebook.com/v21.0/${pageId}/photos`, {
+      method: 'POST',
+      body
+    });
+    const data = await res.json();
+    if (!res.ok || !(data.id || data.post_id)) {
+      const err = new Error(data.error?.message || 'Facebook photo publish failed');
+      err.status = res.status || 502;
+      err.code = 'FB_PUBLISH_FAILED';
+      err.detail = data;
+      throw err;
+    }
+    resultId = data.post_id || data.id;
+  } else {
+    // Text / link post
+    const body = new URLSearchParams({
+      message,
+      access_token: accessToken
+    });
+    const url = mediaUrl || link;
+    if (url && /^https:\/\//i.test(url)) body.set('link', url);
+
+    const res = await fetch(`https://graph.facebook.com/v21.0/${pageId}/feed`, {
+      method: 'POST',
+      body
+    });
+    const data = await res.json();
+    if (!res.ok || !data.id) {
+      const err = new Error(data.error?.message || 'Facebook feed publish failed');
+      err.status = res.status || 502;
+      err.code = 'FB_PUBLISH_FAILED';
+      err.detail = data;
+      throw err;
+    }
+    resultId = data.id;
+  }
+
+  post.status = 'published';
+  post.publishedAt = new Date().toISOString();
+  post.publishResult = {
+    provider: 'facebook',
+    postId: resultId,
+    pageId,
+    pageName,
+    mediaUrl: mediaUrl || null
+  };
+  post.updatedAt = new Date().toISOString();
+  await savePost(posts, post);
+
+  await appendActivity({
+    type: 'publish',
+    summary: `Published to Facebook Page "${pageName}" (${resultId})`,
+    data: { postId, fbPostId: resultId, pageId }
+  });
+
+  return { ok: true, provider: 'facebook', postId: resultId, pageId, pageName, post };
+}
+
+/**
  * Resolve media: prefer explicit mediaUrl, else build public URL from local upload
  * if PUBLIC_BASE_URL is set (e.g. https://your-tunnel.ngrok.app).
  */
@@ -338,7 +424,7 @@ export async function publishPost({
     return { ok: true, provider: 'youtube', ...result };
   }
 
-  // For Meta / TikTok we need a publicly reachable HTTPS URL
+  // For Meta / TikTok / Facebook we need a publicly reachable HTTPS URL when media is used
   const { post } = await getPostOrThrow(postId);
   const resolved = resolveMediaUrl(mediaUrl || post.mediaUrl, post.localMediaUrl);
 
@@ -348,7 +434,10 @@ export async function publishPost({
   if (provider === 'tiktok') {
     return publishToTikTok({ postId, videoUrl: resolved, privacyLevel, force });
   }
-  const err = new Error(`Unsupported publish provider: ${provider}. Use meta, tiktok, or youtube.`);
+  if (provider === 'facebook') {
+    return publishToFacebook({ postId, mediaUrl: resolved, force });
+  }
+  const err = new Error(`Unsupported publish provider: ${provider}. Use meta, tiktok, youtube, or facebook.`);
   err.status = 400;
   err.code = 'UNSUPPORTED_PROVIDER';
   throw err;
@@ -376,7 +465,8 @@ export async function maybeAutoPublish(postId) {
   const platform = (post.platform || '').toLowerCase();
   let provider = null;
   if (platform.includes('tiktok')) provider = 'tiktok';
-  else if (platform.includes('instagram') || platform.includes('facebook')) provider = 'meta';
+  else if (platform.includes('instagram')) provider = 'meta';
+  else if (platform.includes('facebook')) provider = 'facebook';
   else if (platform.includes('youtube')) provider = 'youtube';
 
   if (!provider) {
