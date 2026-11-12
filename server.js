@@ -728,3 +728,14 @@ if (process.env.NODE_ENV !== 'test' && process.argv[1] && path.resolve(process.a
     console.log(`  Auth: password protected\n`);
   });
 }
+export default app;
+
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const isServerless = Boolean(process.env.VERCEL || process.env.FUNCTION_TARGET);
+
+if (process.env.NODE_ENV !== 'test' && isDirectRun && !isServerless) {
+  const port = Number(process.env.PORT) || 3000;
+  app.listen(port, () => {
+    console.log(`Celma → http://127.0.0.1:${port}`);
+  });
+}
